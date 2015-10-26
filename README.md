@@ -12,8 +12,10 @@ home directory).
 
 *Will not work on Windows!*
 
-utils/gfs_spectonc converts gfs binary spectral files to netcdf.
-utils/gfs_sfctonc converts gfs binary surface files to netcdf.
-utils/gfs_nemsiotonc converts gfs nemsio surface files to netcdf.
+`utils/gfs_spectonc` converts gfs binary spectral files to netcdf.
+
+`utils/gfs_sfctonc` converts gfs binary surface files to netcdf.
+
+`utils/gfs_nemsiotonc` converts gfs nemsio surface files to netcdf.
 
 Watch where setup.py installs the utility scripts, you will need to add that location to your `$PATH`.
