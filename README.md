@@ -13,9 +13,9 @@ home directory).
 
 *Will not work on Windows!*
 
-`utils/gfs_spectonc` converts gfs binary spectral files to netcdf.
+`utils/gfs_spectonc` converts gfs binary spectral files to netcdf (assumes the binary spectral data is big endian).
 
-`utils/gfs_sfctonc` converts gfs binary surface files to netcdf.
+`utils/gfs_sfctonc` converts gfs binary surface files to netcdf (assumes the binary surface data is big endian).
 
 `utils/gfs_nemsiotonc` converts gfs nemsio surface files to netcdf.
 
