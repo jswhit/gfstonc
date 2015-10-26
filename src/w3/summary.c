@@ -26,7 +26,7 @@ Jim Tuccillo August 1999
 #ifdef _AIX
 #include <sys/proc.h>   
 #endif
-#ifdef __linux__
+#ifdef LINUX
 #include <errno.h>
 #include <sys/resource.h>
 #endif
@@ -227,7 +227,7 @@ void elapse (timer)
 #ifdef _AIX
       *timer = rtc();
 #endif
-#ifdef __linux__
+#ifdef LINUX
   struct timeval st;
   if (gettimeofday (&st, NULL) == -1) {
     fprintf (stderr,
@@ -351,7 +351,7 @@ void resource ()
      printf("Number of Voluntary Context Switches                 = %d\n", RU.ru_nvcsw);
      printf("Number of InVoluntary Context Switches               = %d\n", RU.ru_nivcsw);
 #endif
-#ifdef __linux__
+#ifdef LINUX
      printf ("The maximum resident set size (KB)                   = %ld\n", RU.ru_maxrss);
      printf ("Number of page faults without I/O activity           = %ld\n", RU.ru_minflt);
      printf ("Number of page faults with I/O activity              = %ld\n", RU.ru_majflt);
@@ -449,7 +449,7 @@ void print_timing (string, time)
 void summary( returnVal  )
 int * returnVal;
 #endif
-#ifdef __linux__
+#ifdef LINUX
 void summary_ (int *returnVal)
 #endif
 {
@@ -475,7 +475,7 @@ void summary_ (int *returnVal)
 #ifdef _AIX
 void start()
 #endif
-#ifdef __linux__
+#ifdef LINUX
 void start_ ()
 #endif
 {
