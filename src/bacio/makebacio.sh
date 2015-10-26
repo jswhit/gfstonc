@@ -59,6 +59,7 @@ export LIB="../libbacio_4.a"
 
 export FFLAGS=" -O2 -fPIC"
 export AFLAGS=" "
-export CFLAGS=" -O2 -DUNDERSCORE -DLINUX -fPIC"
+# -I/usr/include/malloc needed for macos x
+export CFLAGS=" -O2 -DUNDERSCORE -DLINUX -fPIC -I/usr/include/malloc"
 make -f make.bacio
 rm -f make.bacio
