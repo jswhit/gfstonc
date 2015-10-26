@@ -6,7 +6,7 @@ python utilities and modules to read NCEP gfs spectral, surface and nemsio files
 plus the [shtns](https://bitbucket.org/nschaeff/shtns) library for spherical harmonic transforms.
 
 * set the env vars `SHTNS_LIBDIR` and `FFTW3_LIBDIR` to point to where the `shtns` and `fftw3` 
-libraries are installed.  [fftw3](http://www.fftw.org) is required by [shtns](https://bitbucket.org/nschaeff/shtns)/
+libraries are installed.  [fftw3](http://www.fftw.org) is required by [shtns](https://bitbucket.org/nschaeff/shtns).
 * `python setup.py build`
    - setup.py will try to build `src/libw3nco_d.a`  and `src/libbacio_4.a` if they do not
 already exist. 
