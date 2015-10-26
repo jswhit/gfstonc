@@ -1,9 +1,9 @@
 import numpy as np
-from pyspharm import Spharmt
+from ncepsigma import Spharmt
 class ncepsfc(object):
     # read ncep 'sfc' file (fortran gridded binary data)
     def __init__(self,filename):
-        from read_sfc import read_griddata, read_header
+        from _read_sfc import read_griddata, read_header
         nlons,nlats,lsoil,idate,fhour = read_header(filename)
         self._read_griddata = read_griddata
         self.nlons = nlons; self.nlats = nlats

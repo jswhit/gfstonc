@@ -1,5 +1,5 @@
-from pyspharm import Spharmt
-from ncepsigma import ncepsigma
+#!/usr/bin/env python
+from ncepsigma import ncepsigma, Spharmt
 import numpy as np
 from netCDF4 import Dataset
 import sys, time

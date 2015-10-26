@@ -2,7 +2,7 @@ import numpy as np
 class ncepnemsio(object):
     # read ncep gfs 'nemsio' file
     def __init__(self,filename):
-        from read_nemsio import read_nemsio_header, read_nemsio_griddata, read_nemsio_coords
+        from _read_sigma_nemsio import read_nemsio_header, read_nemsio_griddata, read_nemsio_coords
         nlons,nlats,nlevs,idate,nfhour = read_nemsio_header(filename)
         vcoord,lats,lons = read_nemsio_coords(filename,nlons,nlats,nlevs)
         self.vcoord = vcoord[:,:2,0].T

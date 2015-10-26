@@ -1,5 +1,5 @@
 import numpy as np
-from pyspharm import Spharmt
+from .pyspharm import Spharmt
 class ncepsigma(object):
     # read ncep 'sigma' file (spectral binary data)
     def __init__(self,filename):

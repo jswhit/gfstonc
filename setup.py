@@ -19,24 +19,25 @@ if shtns_libdir is None or fftw3_libdir is None:
 srcs_read_sigma_spec =\
 ['src/_read_sigma_spec.pyf','src/kinds.f90','src/sigio_module.f90','src/shtns.f90','src/read_sigma_spec.f90']
 
+libdirs = [shtns_libdir,fftw3_libdir]
 ext_spec = Extension(name     = '_read_sigma_spec',
                      sources       = srcs_read_sigma_spec,
-                     libraries     = [shtns_libdir,fftw3_libdir],
-                     library_dirs  = ['/Users/jwhitaker/lib','/opt/local/lib'])
+                     libraries     = ['shtns','fftw3'],
+                     library_dirs  = libdirs)
 
 srcs_read_sfc =\
-['src/_read_src.pyf','src/kinds.f90','src/sfcio_module.f90','src/read_sfc.f90']
+['src/_read_sfc.pyf','src/kinds.f90','src/sfcio_module.f90','src/read_sfc.f90']
 
-ext_spec = Extension(name     = '_read_sfc',
-                     sources       = srcs_read_sfc)
+ext_sfc = Extension(name     = '_read_sfc',
+                    sources       = srcs_read_sfc)
 
 srcs_read_sigma_nemsio =\
 ['src/_read_sigma_nemsio.pyf','src/kinds.f90','src/nemsio_openclose.f90','src/nemsio_read.f90','src/nemsio_module.f90','src/read_sigma_nemsio.f90']
 
-ext_spec = Extension(name     = '_read_sigma_nemsio',
-                     sources       = srcs_read_sigma_nemsio,
-                     libraries     = ['bacio_4','w3nco_d'],
-                     library_dirs  = ['src'])
+ext_nemsio = Extension(name     = '_read_sigma_nemsio',
+                       sources       = srcs_read_sigma_nemsio,
+                       libraries     = ['bacio_4','w3nco_d'],
+                       library_dirs  = ['src'])
 
 if __name__ == "__main__":
     setup(name = 'gfstonc',
@@ -45,7 +46,7 @@ if __name__ == "__main__":
           author            = "Jeff Whitaker",
           author_email      = "jeffrey.s.whitaker@noaa.gov",
           url               = "http://github.com/jswhit/gfstonc",
-          ext_modules       = [ext_spec],
+          ext_modules       = [ext_spec,ext_nemsio,ext_sfc],
           packages          = ['ncepsigma','ncepsfc','ncepnemsio'],
           scripts           = ['utils/gfs_spectonc','utils/gfs_sfctonc','utils/gfs_nemsiotonc'],
           )

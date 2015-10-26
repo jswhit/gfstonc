@@ -1,3 +1,4 @@
+#!/usr/bin/env python
 from ncepnemsio import ncepnemsio
 import numpy as np
 from netCDF4 import Dataset
