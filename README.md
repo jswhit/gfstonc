@@ -1,7 +1,7 @@
 # gfstonc
-utilities and modules to read NCEP gfs spectral, surface and nemsio files and convert to netcdf
+python utilities and modules to read NCEP gfs spectral, surface and nemsio files and convert to netcdf
 
-([numpy](http://numpy.org), [netcdf4-python](https://github.com/Unidata/netcdf4-python) and
+[numpy](http://numpy.org), [netcdf4-python](https://github.com/Unidata/netcdf4-python) and
 [gfortran](https://gcc.gnu.org/wiki/GFortran) are required, 
 plus [shtns](https://bitbucket.org/nschaeff/shtns) library for spherical harmonic transforms.
 
