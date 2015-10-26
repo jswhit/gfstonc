@@ -6,8 +6,12 @@ import sys, time
 
 # convert ncep gfs spectral file to netcdf (with compression)
 
-filename_siganl = sys.argv[1]
-filename_nc = sys.argv[2]
+try:
+    filename_siganl = sys.argv[1]
+    filename_nc = sys.argv[2]
+except:
+    sys.stdout.write('need to specify input gfs spectral and output netcdf filenames\n')
+    sys.exit(1)
 
 t1 = time.clock()
 sigfile = ncepsigma(filename_siganl)
