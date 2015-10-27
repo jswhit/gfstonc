@@ -3,7 +3,8 @@ python utilities and modules to read NCEP gfs spectral, surface and nemsio files
 
 [numpy](http://numpy.org), [netcdf4-python](https://github.com/Unidata/netcdf4-python) and
 [gfortran](https://gcc.gnu.org/wiki/GFortran) are required, 
-plus the [shtns](https://bitbucket.org/nschaeff/shtns) library for spherical harmonic transforms.
+plus the [shtns](https://bitbucket.org/nschaeff/shtns) spherical harmonic transform
+library (plus the python interface).
 
 * set the env vars `SHTNS_LIBDIR` and `FFTW3_LIBDIR` to point to where the `shtns` and `fftw3` 
 libraries are installed.  [fftw3](http://www.fftw.org) is required by [shtns](https://bitbucket.org/nschaeff/shtns).
