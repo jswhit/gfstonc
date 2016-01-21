@@ -56,5 +56,5 @@ if __name__ == "__main__":
           url               = "http://github.com/jswhit/gfstonc",
           ext_modules       = [ext_spec,ext_sigma_nemsio,ext_sfcflx_nemsio,ext_sfc],
           packages          = ['ncepsigma','ncepsfc','ncepnemsio'],
-          scripts           = ['utils/gfs_spectonc','utils/gfs_sfctonc','utils/gfs_nemsiotonc'],
+          scripts           = ['utils/gfs_spectonc','utils/gfs_sfctonc','utils/gfs_nemsiotonc_3d','utils/gfs_nemsiotonc_2d'],
           )
