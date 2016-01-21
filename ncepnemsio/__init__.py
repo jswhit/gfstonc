@@ -1,5 +1,5 @@
 import numpy as np
-class ncepnemsio(object):
+class ncepnemsio_3d(object):
     # read 3d ncep gfs 'nemsio' file
     def __init__(self,filename):
         from _read_sigma_nemsio import read_nemsio_header, read_nemsio_griddata, read_nemsio_coords
@@ -49,5 +49,3 @@ class ncepnemsio_2d(object):
     def griddata(self):
         grids = self._read_griddata(self.filename,self.nlons,self.nlats,self.irecnames,self.ireclevtypes)
         return grids.T
-
-ncepnemsio_3d = ncepnemsio
