@@ -20,6 +20,8 @@ home directory).
 
 `utils/gfs_sfctonc` converts gfs binary surface files to netcdf (assumes the binary surface data is big endian).
 
-`utils/gfs_nemsiotonc` converts gfs nemsio surface files to netcdf.
+`utils/gfs_nemsiotonc_3d` converts gfs 3d nemsio files to netcdf.
+
+`utils/gfs_nemsiotonc_2d` converts gfs 2d nemsio files to netcdf.
 
 Watch where setup.py installs the utility scripts, you will need to add that location to your `$PATH`.
