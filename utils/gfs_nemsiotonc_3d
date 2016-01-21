@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-from ncepnemsio import ncepnemsio
+from ncepnemsio import ncepnemsio_3d
 import numpy as np
 from netCDF4 import Dataset
 import sys, time
@@ -14,7 +14,7 @@ except:
     sys.exit(1)
 
 t1 = time.clock()
-nemsiofile = ncepnemsio(filename_nemsio)
+nemsiofile = ncepnemsio_3d(filename_nemsio)
 ug,vg,tempg,zsg,psg,qg,ozg,cwmrg,dpk,prs = nemsiofile.griddata()
 nlevs,nlats,nlons = ug.shape
 t2 = time.clock()
