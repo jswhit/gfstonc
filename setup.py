@@ -34,10 +34,18 @@ ext_sfc = Extension(name     = '_read_sfc',
 srcs_read_sigma_nemsio =\
 ['src/_read_sigma_nemsio.pyf','src/kinds.f90','src/nemsio_openclose.f90','src/nemsio_read.f90','src/nemsio_module.f90','src/read_sigma_nemsio.f90']
 
-ext_nemsio = Extension(name     = '_read_sigma_nemsio',
-                       sources       = srcs_read_sigma_nemsio,
-                       libraries     = ['bacio_4','w3nco_d'],
-                       library_dirs  = ['src'])
+srcs_read_sfcflx_nemsio =\
+['src/_read_sfcflx_nemsio.pyf','src/kinds.f90','src/nemsio_openclose.f90','src/nemsio_read.f90','src/nemsio_module.f90','src/read_sfcflx_nemsio.f90']
+
+ext_sigma_nemsio = Extension(name     = '_read_sigma_nemsio',
+                             sources       = srcs_read_sigma_nemsio,
+                             libraries     = ['bacio_4','w3nco_d'],
+                             library_dirs  = ['src'])
+
+ext_sfcflx_nemsio = Extension(name     = '_read_sfcflx_nemsio',
+                             sources       = srcs_read_sfcflx_nemsio,
+                             libraries     = ['bacio_4','w3nco_d'],
+                             library_dirs  = ['src'])
 
 if __name__ == "__main__":
     setup(name = 'gfstonc',
@@ -46,7 +54,7 @@ if __name__ == "__main__":
           author            = "Jeff Whitaker",
           author_email      = "jeffrey.s.whitaker@noaa.gov",
           url               = "http://github.com/jswhit/gfstonc",
-          ext_modules       = [ext_spec,ext_nemsio,ext_sfc],
+          ext_modules       = [ext_spec,ext_sigma_nemsio,ext_sfcflx_nemsio,ext_sfc],
           packages          = ['ncepsigma','ncepsfc','ncepnemsio'],
           scripts           = ['utils/gfs_spectonc','utils/gfs_sfctonc','utils/gfs_nemsiotonc'],
           )

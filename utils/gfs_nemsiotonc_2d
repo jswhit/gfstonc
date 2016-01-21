@@ -1,0 +1,52 @@
+#!/usr/bin/env python
+from ncepnemsio import ncepnemsio_2d
+import numpy as np
+from netCDF4 import Dataset
+import sys, time
+
+# convert ncep gfs nemsio file to netcdf (with compression)
+
+try:
+    filename_nemsio = sys.argv[1]
+    filename_nc = sys.argv[2]
+except:
+    sys.stdout.write('need to specify input gfs nemsio and output netcdf filenames\n')
+    sys.exit(1)
+
+t1 = time.clock()
+nemsiofile = ncepnemsio_2d(filename_nemsio)
+grids = nemsiofile.griddata()
+nrecs,nlats,nlons = grids.shape
+t2 = time.clock()
+print 'time to read data',t2-t1
+print 'nrecs,nlats,nlons',nrecs,nlats,nlons
+
+ncfile = Dataset(filename_nc,'w',format='NETCDF4_CLASSIC')
+ncfile.analysis_date=int(nemsiofile.idate)
+ncfile.forecast_hour=nemsiofile.fhour
+ncfile.createDimension('latitude',nlats)
+ncfile.createDimension('longitude',nlons)
+lats = ncfile.createVariable('latitude',np.float32,'latitude')
+lats.desc = 'latitude in degrees'
+lats.units = 'degrees north'
+lats[:] = nemsiofile.lats
+lons = ncfile.createVariable('longitude',np.float32,'longitude')
+lons.desc = 'longitude in degrees'
+lons.units = 'degrees east'
+lons[:] = nemsiofile.lons
+vars = []
+varnames = []
+for nrec in range(nrecs):
+    varname = nemsiofile.recnames[nrec]+'_'+nemsiofile.reclevtypes[nrec].replace (" ", "_")
+    varname = varname.replace(".","")
+    if varname in varnames:
+        varname = varname+"_2"
+    varnames.append(varname)
+    print('%s %s min/max %s %s' % (nrec,varname,grids[nrec].min(), grids[nrec].max()))
+    vars.append( ncfile.createVariable(varname,np.float32,('latitude','longitude',),zlib=True) )
+    vars[nrec][:] = grids[nrec]
+    ncfile.sync()
+ncfile.close()
+t3 = time.clock()
+print 'time to write netcdf file',t3-t2
+print 'total time',t3-t1
