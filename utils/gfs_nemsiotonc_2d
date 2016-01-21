@@ -39,8 +39,11 @@ varnames = []
 for nrec in range(nrecs):
     varname = nemsiofile.recnames[nrec]+'_'+nemsiofile.reclevtypes[nrec].replace (" ", "_")
     varname = varname.replace(".","")
-    if varname in varnames:
-        varname = varname+"_2"
+    ncount = 1
+    varname_orig = varname
+    while varname in varnames:
+        varname = "%s_%s" % (varname_orig,ncount)
+        ncount += 1
     varnames.append(varname)
     print('%s %s min/max %s %s' % (nrec,varname,grids[nrec].min(), grids[nrec].max()))
     vars.append( ncfile.createVariable(varname,np.float32,('latitude','longitude',),zlib=True) )
