@@ -1,29 +1,41 @@
 #!/usr/bin/env python
-from ncepnemsio import ncepnemsio_3d
+import time
 import numpy as np
 from netCDF4 import Dataset
-import sys, time
+from argparse import ArgumentParser, ArgumentDefaultsHelpFormatter
+from ncepnemsio import ncepnemsio_3d
 
 # convert ncep gfs nemsio file to netcdf (with compression)
 
-try:
-    filename_nemsio = sys.argv[1]
-    filename_nc = sys.argv[2]
-except:
-    sys.stdout.write('need to specify input gfs nemsio and output netcdf filenames\n')
-    sys.exit(1)
+parser = ArgumentParser(description='convert 3D NCEP GFS NEMSIO file to netCDF4 file (with compression)', formatter_class=ArgumentDefaultsHelpFormatter)
+parser.add_argument('-i','--input',help='input 3D NEMSIO file name',type=str,required=True)
+parser.add_argument('-v','--verbose',help='verbose',action='store_true',required=False)
+args = parser.parse_args()
 
-t1 = time.clock()
-nemsiofile = ncepnemsio_3d(filename_nemsio)
+filename_nemsio = args.input
+verbose = args.verbose
+filename_nc = args.input + '.nc4'
+
+if verbose:
+    t1 = time.clock()
+
+try:
+    nemsiofile = ncepnemsio_3d(filename_nemsio)
+except IOError:
+    raise RuntimeError('Unable to open %s' % filename_nemsio)
+
 ug,vg,tempg,zsg,psg,qg,ozg,cwmrg,dpk,prs = nemsiofile.griddata()
 nlevs,nlats,nlons = ug.shape
-t2 = time.clock()
-print 'time to read data',t2-t1
-print 'nlevs,nlats,nlons',nlevs,nlats,nlons
-print 'max spfh,o3mr,cwmr',qg.max(),ozg.max(),cwmrg.max()
+
+if verbose:
+    t2 = time.clock()
+    print 'time to read data',t2-t1
+    print 'nlevs,nlats,nlons',nlevs,nlats,nlons
+    print 'max spfh,o3mr,cwmr',qg.max(),ozg.max(),cwmrg.max()
+    print 'pres min/max',prs.min(), prs.max()
+
 ak = nemsiofile.vcoord[0]
 bk = nemsiofile.vcoord[1]
-print 'pres min/max',prs.min(), prs.max()
 
 ncfile = Dataset(filename_nc,'w',format='NETCDF4_CLASSIC')
 ncfile.analysis_date=int(nemsiofile.idate)
@@ -54,13 +66,15 @@ b_k.desc = 'b_k in hybrid coordinate definition'
 b_k.units = 'unitless'
 ps = ncfile.createVariable('ps',np.float32,('latitude','longitude',),zlib=True,\
     least_significant_digit=2)
-print 'ps min/max',psg.min(), psg.max()
+if verbose:
+    print 'ps min/max',psg.min(), psg.max()
 ps.units = 'Pa'
 ps.desc = 'surface pressure'
 ps[:] = psg
 zs = ncfile.createVariable('zs',np.float32,('latitude','longitude',),zlib=True,\
     least_significant_digit=2)
-print 'zs min/max',zsg.min(), zsg.max()
+if verbose:
+    print 'zs min/max',zsg.min(), zsg.max()
 ps.desc = 'surface orography'
 ps.units = 'm'
 zs[:] = zsg
@@ -105,6 +119,8 @@ cwmr.desc = 'total cloud condensate mixing ratio'
 cwmr.units = 'kg per kg'
 cwmr[:] = cwmrg
 ncfile.close()
-t4 = time.clock()
-print 'time to write netcdf file',t4-t2
-print 'total time',t4-t1
+
+if verbose:
+    t4 = time.clock()
+    print 'time to write netcdf file',t4-t2
+    print 'total time',t4-t1

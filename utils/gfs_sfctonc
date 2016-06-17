@@ -1,25 +1,32 @@
 #!/usr/bin/env python
-from ncepsfc import ncepsfc
+import time
 import numpy as np
 from netCDF4 import Dataset
-import sys, time
+from argparse import ArgumentParser, ArgumentDefaultsHelpFormatter
+from ncepsfc import ncepsfc
 
 # convert ncep gfs surface file to netcdf
 
-try:
-    filename_sfcanl = sys.argv[1]
-    filename_nc = sys.argv[2]
-except:
-    sys.stdout.write('need to specify input gfs surface and output netcdf filenames\n')
-    sys.exit(1)
+parser = ArgumentParser(description='convert NCEP GFS surface file to netCDF4 file (with compression)', formatter_class=ArgumentDefaultsHelpFormatter)
+parser.add_argument('-i','--input',help='input surface file name',type=str,required=True)
+parser.add_argument('-v','--verbose',help='verbose',action='store_true',required=False)
+args = parser.parse_args()
 
-t1 = time.clock()
+filename_sfcanl = args.input
+verbose = args.verbose
+filename_nc = args.input + '.nc4'
+
+if verbose:
+    t1 = time.clock()
+
 sfcfile = ncepsfc(filename_sfcanl)
 grids2d,grids2d_desc,grids2d_name,grids3d,grids3d_desc,grids3d_name = sfcfile.griddata()
 nlats = sfcfile.nlats; nlons = sfcfile.nlons; lsoil = sfcfile.lsoil
-t2 = time.clock()
-print 'time to read data',t2-t1
-print 'lsoil,nlats,nlons',lsoil,nlats,nlons
+
+if verbose:
+    t2 = time.clock()
+    print 'time to read data',t2-t1
+    print 'lsoil,nlats,nlons',lsoil,nlats,nlons
 
 ncfile = Dataset(filename_nc,'w',format='NETCDF4_CLASSIC')
 ncfile.analysis_date=int(sfcfile.idate)
@@ -50,6 +57,8 @@ for ngrid in range(grids3d.shape[0]):
     var[:] = grids3d[ngrid]
 
 ncfile.close()
-t4 = time.clock()
-print 'time to write netcdf file',t4-t2
-print 'total time',t4-t1
+
+if verbose:
+    t4 = time.clock()
+    print 'time to write netcdf file',t4-t2
+    print 'total time',t4-t1
