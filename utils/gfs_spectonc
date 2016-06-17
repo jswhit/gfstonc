@@ -1,26 +1,38 @@
 #!/usr/bin/env python
-from ncepsigma import ncepsigma
+import time
 import numpy as np
 from netCDF4 import Dataset
-import sys, time
+from argparse import ArgumentParser, ArgumentDefaultsHelpFormatter
+from ncepsigma import ncepsigma
 
 # convert ncep gfs spectral file to netcdf (with compression)
 
-try:
-    filename_siganl = sys.argv[1]
-    filename_nc = sys.argv[2]
-except:
-    sys.stdout.write('need to specify input gfs spectral and output netcdf filenames\n')
-    sys.exit(1)
+parser = ArgumentParser(description='convert NCEP GFS spectral file to netCDF4 file (with compression)', formatter_class=ArgumentDefaultsHelpFormatter)
+parser.add_argument('-i','--input',help='input spectral file name',type=str,required=True)
+parser.add_argument('-v','--verbose',help='verbose',action='store_true',required=False)
+args = parser.parse_args()
 
-t1 = time.clock()
-sigfile = ncepsigma(filename_siganl)
+filename_siganl = args.input
+verbose = args.verbose
+filename_nc = args.input + '.nc4'
+
+if verbose:
+    t1 = time.clock()
+
+try:
+    sigfile = ncepsigma(filename_siganl)
+except IOError:
+    raise RuntimeError('Unable to open %s' % filename_siganl)
+
 ug,vg,tempg,zsg,psg,qg,ozg,cwmrg = sigfile.griddata()
 nlevs,nlats,nlons = ug.shape
-t2 = time.clock()
-print 'time to read data and transform to grid',t2-t1
-print 'nlevs,nlats,nlons',nlevs,nlats,nlons
-print 'max spfh,o3mr,cwmr',qg.max(),ozg.max(),cwmrg.max()
+
+if verbose:
+    t2 = time.clock()
+    print 'time to read data and transform to grid',t2-t1
+    print 'nlevs,nlats,nlons',nlevs,nlats,nlons
+    print 'max spfh,o3mr,cwmr',qg.max(),ozg.max(),cwmrg.max()
+
 ak = sigfile.vcoord[0]
 bk = sigfile.vcoord[1]
 rd = 2.8705e+2; cp = 1.0046e+3; rk = rd/cp
@@ -29,10 +41,12 @@ pk = ak[:,np.newaxis,np.newaxis] + bk[:,np.newaxis,np.newaxis]*psg[np.newaxis,:,
 dpk = pk[:-1,:,:]-pk[1:,:,:]
 pkrk1 = pk**rk1
 prs = ((pkrk1[:-1]-pkrk1[1:])/(rk1*dpk))**(1./rk)
-print 'pres min/max',prs.min(), prs.max()
 
-t3 = time.clock()
-print 'time to calculate pressure on levels',t3-t2
+if verbose:
+    print 'pres min/max',prs.min(), prs.max()
+    t3 = time.clock()
+    print 'time to calculate pressure on levels',t3-t2
+
 ncfile = Dataset(filename_nc,'w',format='NETCDF4_CLASSIC')
 ncfile.analysis_date=int(sigfile.idate)
 ncfile.forecast_hour=sigfile.fhour
@@ -62,13 +76,15 @@ b_k.desc = 'b_k in hybrid coordinate definition'
 b_k.units = 'unitless'
 ps = ncfile.createVariable('ps',np.float32,('latitude','longitude',),zlib=True,\
     least_significant_digit=2)
-print 'ps min/max',psg.min(), psg.max()
+if verbose:
+    print 'ps min/max',psg.min(), psg.max()
 ps.units = 'Pa'
 ps.desc = 'surface pressure'
 ps[:] = psg
 zs = ncfile.createVariable('zs',np.float32,('latitude','longitude',),zlib=True,\
     least_significant_digit=2)
-print 'zs min/max',zsg.min(), zsg.max()
+if verbose:
+    print 'zs min/max',zsg.min(), zsg.max()
 ps.desc = 'surface orography'
 ps.units = 'm'
 zs[:] = zsg
@@ -113,6 +129,8 @@ cwmr.desc = 'total cloud condensate mixing ratio'
 cwmr.units = 'kg per kg'
 cwmr[:] = cwmrg
 ncfile.close()
-t4 = time.clock()
-print 'time to write netcdf file',t4-t3
-print 'total time',t4-t1
+
+if verbose:
+    t4 = time.clock()
+    print 'time to write netcdf file',t4-t3
+    print 'total time',t4-t1
