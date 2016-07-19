@@ -26,7 +26,7 @@ class ncepsigma(object):
         self._read_specdata(self.filename,self.ntrunc,self.nlevs)
         nf = self._nf
         return nf*vrtspec.T,nf*divspec.T,nf*tempspec.T,\
-               nf*zspec,nf*lnpsspec,nf*qspec.T,nf*ozpec.T,\
+               nf*zspec,nf*lnpsspec,nf*qspec.T,nf*ozspec.T,\
                nf*cwmrspec.T
     def griddata(self):
         ug,vg,tempg,zsg,psg,qg,ozg,cwmrg = self._read_griddata(self.filename,self.nlons,self.nlats,self.nlevs)
