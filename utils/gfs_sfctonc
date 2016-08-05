@@ -9,12 +9,13 @@ from ncepsfc import ncepsfc
 
 parser = ArgumentParser(description='convert NCEP GFS surface file to netCDF4 file (with compression)', formatter_class=ArgumentDefaultsHelpFormatter)
 parser.add_argument('-i','--input',help='input surface file name',type=str,required=True)
+parser.add_argument('-o','--output',help='output netCDF4 file name',type=str,required=False)
 parser.add_argument('-v','--verbose',help='verbose',action='store_true',required=False)
 args = parser.parse_args()
 
 filename_sfcanl = args.input
 verbose = args.verbose
-filename_nc = args.input + '.nc4'
+filename_nc = args.input + '.nc4' if args.output is None else args.output
 
 if verbose:
     t1 = time.clock()
@@ -35,11 +36,11 @@ ncfile.createDimension('latitude',nlats)
 ncfile.createDimension('longitude',nlons)
 ncfile.createDimension('layer',lsoil)
 lats = ncfile.createVariable('latitude',np.float32,'latitude')
-lats.units = 'degrees north'
+lats.units = 'degrees_north'
 lats.desc = 'latitude in degrees'
 lats[:] = sfcfile.lats
 lons = ncfile.createVariable('longitude',np.float32,'longitude')
-lons.units = 'degrees east'
+lons.units = 'degrees_east'
 lons.desc = 'longitude in degrees'
 lons[:] = sfcfile.lons
 levs = ncfile.createVariable('layer',np.int32,'layer')

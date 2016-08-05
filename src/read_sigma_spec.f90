@@ -153,7 +153,11 @@ subroutine read_griddata(filename, nlons, nlats, nlevs, ug, vg, tempg, zsg, psg,
 !$omp end parallel do
   call spectogrd(lnpsspec, psg)
   call spectogrd(topospec, zsg)
-  psg = 1000.*exp(psg) ! convert to Pa
+  if ( mod(sighead%idvm,10) /= 2 ) then
+    psg = 1000.*exp(psg) ! convert to Pa
+  else
+    psg = 1000.*psg ! convert to Pa
+  endif
   !print *,'min/max ps',minval(psg),maxval(psg)
   !print *,'min/max zs',minval(zsg),maxval(zsg)
 !$omp parallel do private(k)
