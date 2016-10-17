@@ -103,16 +103,20 @@ subroutine read_nemsio_griddata(filename, nlons, nlats, nlevs, ug, vg, tempg, zs
   use kinds, only: r_kind
   use nemsio_module, only: nemsio_gfile,nemsio_open,nemsio_close,&
                            nemsio_getheadvar,nemsio_realkind,&
-                           nemsio_readrecv,nemsio_init
+                           nemsio_readrecv,nemsio_init,nemsio_getfilehead
   integer, intent(in) :: nlons,nlats,nlevs
   real(r_kind), intent(out),dimension(nlons,nlats,nlevs) :: &
   ug,vg,tempg,qg,ozg,cwmrg,dpresg,presg
   real(r_kind), intent(out), dimension(nlons,nlats) :: psg,zsg
+  real(nemsio_realkind) nems_vcoord(nlevs+1,3,2),ak(nlevs+1),bk(nlevs+1)
+  real(r_kind), dimension(nlons,nlats) :: press_bot, press_top
   character(len=500), intent(in) :: filename
   real(nemsio_realkind), dimension(nlons*nlats) :: nems_wrk
   real(nemsio_realkind), dimension(nlons,nlats) :: nems_wrk2
+  real(r_kind) :: kap,kap1,kapr,rd,cp
   type(nemsio_gfile) :: gfile
-  integer iret
+  integer iret, idvc
+  logical has_dpres
   call nemsio_init(iret=iret)
   if(iret/=0) then
      write(6,*)'problem with nemsio_init, iret=',iret
@@ -140,21 +144,64 @@ subroutine read_nemsio_griddata(filename, nlons, nlats, nlevs, ug, vg, tempg, zs
       stop
   endif
 
+  has_dpres = .true.
+  call nemsio_readrecv(gfile,'dpres','mid layer',k,nems_wrk,iret=iret)
+  if (iret/=0) then
+      rd = 287.05; cp = 1004.6
+      kap = rd/cp
+      kapr = cp/rd
+      kap1 = kap + 1.0
+      has_dpres = .false.
+      call nemsio_getfilehead(gfile,iret=iret,vcoord=nems_vcoord)
+      if ( iret /= 0 ) then
+         write(6,*) 'problem reading nemsio header ', &
+            'vcoord, Status = ',iret
+         stop
+      endif
+      call nemsio_getfilehead(gfile,iret=iret,idvc=idvc)
+      if ( idvc == 0 ) then                         ! sigma coordinate, old file format.
+         ak = zero
+         bk = nems_vcoord(1:nlevs+1,1,1)
+      elseif ( idvc == 1 ) then                     ! sigma coordinate
+         ak = zero
+         bk = nems_vcoord(1:nlevs+1,2,1)
+      elseif ( idvc == 2 .or. idvc == 3 ) then      ! hybrid coordinate
+         ak = 0.01_r_kind*nems_vcoord(1:nlevs+1,1,1) ! convert to mb
+         bk = nems_vcoord(1:nlevs+1,2,1)
+      else
+         write(6,*)' ***ERROR*** INVALID value for idvc=',idvc
+         stop
+      endif
+      ! pressure thicknesses
+      press_bot = psg 
+      do k=2,nlevs+1
+         press_top = ak(k)+bk(k)*psg
+         dpresg(:,:,k-1) = press_bot - press_top
+         !print *,k-1,minval(dpresg(:,:,k-1)),maxval(dpresg(:,:,k-1))
+         presg(:,:,k-1) = ((press_bot**kap1-press_top**kap1)/&
+                          (kap1*(press_bot-press_top)))**kapr
+         !print *,k-1,minval(presg(:,:,k-1)),maxval(presg(:,:,k-1))
+         press_bot = press_top
+      enddo
+  endif
+
   do k=1,nlevs
-     call nemsio_readrecv(gfile,'dpres','mid layer',k,nems_wrk,iret=iret)
-     if (iret/=0) then
-         write(6,*)'problem with nemsio_readrecv(dpress), iret=',iret
-         stop
+     if (has_dpres) then
+         call nemsio_readrecv(gfile,'dpres','mid layer',k,nems_wrk,iret=iret)
+         if (iret /= 0) then
+            write(6,*)'problem with nemsio_readrecv(dpress), iret=',iret
+            stop
+         endif
+         call onedtotwod(nems_wrk,nems_wrk2,nlons,nlats)
+         dpresg(:,:,k) = nems_wrk2
+         call nemsio_readrecv(gfile,'pres','mid layer',k,nems_wrk,iret=iret)
+         if (iret/=0) then
+             write(6,*)'problem with nemsio_readrecv(pres), iret=',iret
+             stop
+         endif
+         call onedtotwod(nems_wrk,nems_wrk2,nlons,nlats)
+         presg(:,:,k) = nems_wrk2
      endif
-     call onedtotwod(nems_wrk,nems_wrk2,nlons,nlats)
-     dpresg(:,:,k) = nems_wrk2
-     call nemsio_readrecv(gfile,'pres','mid layer',k,nems_wrk,iret=iret)
-     if (iret/=0) then
-         write(6,*)'problem with nemsio_readrecv(pres), iret=',iret
-         stop
-     endif
-     call onedtotwod(nems_wrk,nems_wrk2,nlons,nlats)
-     presg(:,:,k) = nems_wrk2
      call nemsio_readrecv(gfile,'ugrd','mid layer',k,nems_wrk,iret=iret)
      if (iret/=0) then
          write(6,*)'problem with nemsio_readrecv(ugrd), iret=',iret
