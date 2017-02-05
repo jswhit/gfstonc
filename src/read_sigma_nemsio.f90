@@ -25,27 +25,7 @@ subroutine read_nemsio_header(filename,nlons,nlats,nlevs,idate,nfhour)
       write(6,*)'problem with nemsio_open, iret=',iret
       stop
    endif
-   call nemsio_getheadvar(gfile,'dimx',nlons,iret)
-   if (iret/=0) then
-      write(6,*)'problem with nemsio_getheadvar, iret=',iret
-      stop
-   end if
-   call nemsio_getheadvar(gfile,'dimy',nlats,iret)
-   if (iret/=0) then
-      write(6,*)'problem with nemsio_getheadvar, iret=',iret
-      stop
-   end if
-   call nemsio_getheadvar(gfile,'dimz',nlevs,iret)
-   if (iret/=0) then
-      write(6,*)'problem with nemsio_getheadvar, iret=',iret
-      stop
-   end if
-   call nemsio_getheadvar(gfile,'idate',idate,iret)
-   if (iret/=0) then
-      write(6,*)'problem with nemsio_getheadvar, iret=',iret
-      stop
-   end if
-   call nemsio_getheadvar(gfile,'nfhour',nfhour,iret)
+   call nemsio_getfilehead(gfile,dimx=nlons,dimy=nlats,dimz=nlevs,idate=idate,iret=iret)
    if (iret/=0) then
       write(6,*)'problem with nemsio_getheadvar, iret=',iret
       stop
