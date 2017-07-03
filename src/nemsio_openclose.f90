@@ -4237,7 +4237,7 @@ contains
     endif
     if(gfile%nmeta>=6)then
       allocate(gfile%vcoord(dimvcoord1,3,2) ,stat=iret2) 
-      if(iret3.eq.0) then
+      if(iret2.eq.0) then
       gfile%vcoord=nemsio_realfill
       endif
       iret=iret+abs(iret2)
@@ -4934,6 +4934,12 @@ contains
     gribtable(1)%item(117)=nemsio_grbtbl_item('csdsf','sfc',0,0,161,1)
     gribtable(1)%item(118)=nemsio_grbtbl_item('csulf','sfc',0,0,162,1)
     gribtable(1)%item(119)=nemsio_grbtbl_item('snohf','sfc',0,0,229,1)
+
+    gribtable(1)%item(120)=nemsio_grbtbl_item('vbdsf','sfc',0,0,166,1)
+    gribtable(1)%item(121)=nemsio_grbtbl_item('vddsf','sfc',0,0,167,1)
+    gribtable(1)%item(122)=nemsio_grbtbl_item('nbdsf','sfc',0,0,168,1)
+    gribtable(1)%item(123)=nemsio_grbtbl_item('nddsf','sfc',0,0,169,1)
+    gribtable(1)%item(124)=nemsio_grbtbl_item('cpofp','sfc',0,0,194,1)
 !    
 !    gribtable(1)%item(50)=nemsio_grbtbl_item('nlat','sfc',2,0,176,1)
 !    gribtable(1)%item(51)=nemsio_grbtbl_item('elon','sfc',2,0,177,1)
@@ -5403,53 +5409,6 @@ contains
 !-----------------------------------------------------------------------
 !
       end function equal_str_nocase
-
-      subroutine chk_endianc(endian)
-!
-        implicit none
-!
-        character(16),intent(out)    :: endian
-!     ------------------------------------------------------------------
-        INTEGER,PARAMETER :: ASCII_0 = 48,ASCII_1 = 49,ASCII_2 = 50,    &
-                           ASCII_3 = 51
-        INTEGER(4)        :: I
-        common// I
-!     ------------------------------------------------------------------
-!***** code start
-!     ------------------------------------------------------------------
-        I = ASCII_0 + ASCII_1*256 + ASCII_2*(256**2) + ASCII_3*(256**3)
-        call sub(endian)
-!
-!     ------------------------------------------------------------------
-!
-      end subroutine chk_endianc
-
-      subroutine sub(endian)
-!
-        implicit none
-!
-        character(16),intent(out)        :: endian
-!        character,intent(inout) :: i*4
-        character               :: i*4
-        common//  i
-!     ------------------------------------------------------------------
-        if(i .eq. '0123') then
-!          WRITE(*,*) ' Machine is Little-Endian '
-          endian='little_endian'
-          return
-        elseif (i .eq. '3210') then
-!          WRITE(*,*) ' Machine is Big-Endian '
-          endian='big_endian'
-          return
-        else
-!          WRITE(*,*) ' Mixed endianity machine ... '
-          endian='mixed_endian'
-          return
-        endif
-!
-!     ------------------------------------------------------------------
-!
-      end subroutine sub
 !
 !-----------------------------------------------------------------------
 !
