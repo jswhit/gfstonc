@@ -51,11 +51,13 @@ varnames = []
 for nrec in range(nrecs):
     varname = nemsiofile.recnames[nrec]+'_'+nemsiofile.reclevtypes[nrec].replace (" ", "_")
     varname = varname.replace(".","")
-    ncount = 1
-    varname_orig = varname
-    while varname in varnames:
-        varname = "%s_%s" % (varname_orig,ncount)
-        ncount += 1
+# CSD - updated to make variable name consistent with model soil layer number
+#    ncount = 1
+#    varname_orig = varname
+#    while varname in varnames: 
+    if (nemsiofile.reclevtypes[nrec]=='soil layer'): 
+        varname = "%s_%s" % (varname,nemsiofile.reclevs[nrec])
+#        ncount += 1
     varnames.append(varname)
     if verbose:
         print('%s %s min/max %s %s' % (nrec,varname,grids[nrec].min(), grids[nrec].max()))
