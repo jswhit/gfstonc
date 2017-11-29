@@ -25,7 +25,7 @@ class ncepnemsio_2d(object):
                                         read_nemsio_2dgriddata, read_nemsio_latlons
         nlons,nlats,nrecs,idate,nfhour = read_nemsio_header(filename)
         lats,lons = read_nemsio_latlons(filename,nlons,nlats)
-        irecnames, ireclevtypes = read_nemsio_varnames(filename,nrecs)
+        irecnames, ireclevtypes, ireclevs = read_nemsio_varnames(filename,nrecs)
         self._read_griddata = read_nemsio_2dgriddata
         self.nlons = nlons; self.nlats = nlats
         self.nrecs = nrecs
@@ -36,6 +36,7 @@ class ncepnemsio_2d(object):
         self.lons = lons
         self.irecnames = irecnames
         self.ireclevtypes = ireclevtypes
+        self.reclevs = ireclevs
         recnames = []; reclevtypes = []
         for n in range(nrecs):
             s = irecnames[n].tostring()
@@ -47,5 +48,5 @@ class ncepnemsio_2d(object):
         self.recnames = recnames
         self.reclevtypes = reclevtypes
     def griddata(self):
-        grids = self._read_griddata(self.filename,self.nlons,self.nlats,self.irecnames,self.ireclevtypes)
+        grids = self._read_griddata(self.filename,self.nlons,self.nlats,self.irecnames,self.ireclevtypes, self.reclevs)
         return grids.T

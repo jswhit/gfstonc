@@ -95,7 +95,7 @@ subroutine read_nemsio_latlons(filename, nlons, nlats, lats, lons)
    call nemsio_close(gfile, iret=iret)
 end subroutine read_nemsio_latlons
 
-subroutine read_nemsio_varnames(filename, nrecs, irecnames, ireclevtypes)
+subroutine read_nemsio_varnames(filename, nrecs, irecnames, ireclevtypes, ireclevs)
    use kinds, only: r_kind
    use nemsio_module, only: nemsio_gfile,nemsio_open,nemsio_close,&
                             nemsio_getheadvar,nemsio_realkind,&
@@ -107,6 +107,7 @@ subroutine read_nemsio_varnames(filename, nrecs, irecnames, ireclevtypes)
    character(len=n_str) :: recnames(nrecs),reclevtypes(nrecs)
    integer, intent(out), dimension(nrecs,n_str) :: irecnames
    integer, intent(out), dimension(nrecs,n_str) :: ireclevtypes
+   integer, intent(out), dimension(nrecs) :: ireclevs
    type(nemsio_gfile) :: gfile
    integer iret,nrec
 
@@ -120,7 +121,7 @@ subroutine read_nemsio_varnames(filename, nrecs, irecnames, ireclevtypes)
       write(6,*)'problem with nemsio_open, iret=',iret
       stop
    endif
-   call nemsio_getfilehead(gfile,iret=iret,recname=recnames,reclevtyp=reclevtypes)
+   call nemsio_getfilehead(gfile,iret=iret,recname=recnames,reclevtyp=reclevtypes, reclev=ireclevs)
    if (iret/=0) then
       write(6,*)'problem with nemsio_getfilehead (recname,reclevtyp), iret=',iret
       stop
@@ -132,7 +133,7 @@ subroutine read_nemsio_varnames(filename, nrecs, irecnames, ireclevtypes)
    call nemsio_close(gfile, iret=iret)
 end subroutine read_nemsio_varnames
 
-subroutine read_nemsio_2dgriddata(filename, nlons, nlats, nrecs, irecnames, ireclevtypes, grids)
+subroutine read_nemsio_2dgriddata(filename, nlons, nlats, nrecs, irecnames, ireclevtypes,reclevs,grids)
   use kinds, only: r_kind
   use nemsio_module, only: nemsio_gfile,nemsio_open,nemsio_close,&
                            nemsio_getheadvar,nemsio_realkind,&
@@ -144,11 +145,13 @@ subroutine read_nemsio_2dgriddata(filename, nlons, nlats, nrecs, irecnames, irec
   character(len=500), intent(in) :: filename
   integer,  intent(in) :: irecnames(nrecs,n_str),ireclevtypes(nrecs,n_str)
   character(len=n_str) :: recnames(nrecs),reclevtypes(nrecs)
+  integer,  intent(in) :: reclevs(nrecs) 
   real(nemsio_realkind), dimension(nlons*nlats) :: nems_wrk
   real(nemsio_realkind), dimension(nlons,nlats) :: nems_wrk2
   type(nemsio_gfile) :: gfile
   integer iret,nrec
   call nemsio_init(iret=iret)
+  print *,  'in read_sfcflx_nemsio.f90'
   if(iret/=0) then
      write(6,*)'problem with nemsio_init, iret=',iret
      stop
@@ -162,8 +165,8 @@ subroutine read_nemsio_2dgriddata(filename, nlons, nlats, nrecs, irecnames, irec
   do nrec=1,nrecs
       call arrtostr(irecnames(nrec,:),recnames(nrec),n_str)
       call arrtostr(ireclevtypes(nrec,:),reclevtypes(nrec),n_str)
-      !print *,nrec,trim(recnames(nrec)),' ',trim(reclevtypes(nrec))
-      call nemsio_readrecv(gfile,trim(recnames(nrec)),trim(reclevtypes(nrec)),1,nems_wrk,iret=iret)
+      !print *,nrec,trim(recnames(nrec)),' ',trim(reclevtypes(nrec)), ' ', reclevs(nrec)
+      call nemsio_readrecv(gfile,trim(recnames(nrec)),trim(reclevtypes(nrec)),reclevs(nrec),nems_wrk,iret=iret)
       call onedtotwod(nems_wrk,nems_wrk2,nlons,nlats)
       grids(:,:,nrec) = nems_wrk2
       if (iret/=0) then
